@@ -33,13 +33,22 @@ class SMTPHandler(AbstractHandler):
             self.options['to'] = [self.options['to']]
 
     @gen.coroutine
-    def notify(self, level, *args, **kwargs):
+    def notify(self, level, alert, *args, **kwargs):
         LOGGER.debug("Handler (%s) %s", self.name, level)
 
-        msg = self.get_message(level, *args, **kwargs)
-        msg['Subject'] = self.get_short(level, *args, **kwargs)
-        msg['From'] = self.options['from']
-        msg['To'] = ", ".join(self.options['to'])
+        sender = self.options['from']
+        to = self.options['to']
+        if alert.overrides and self.name in alert.overrides:
+            overrides = alert.overrides[self.name]
+            sender = overrides.get('from', sender)
+            to = overrides.get('to', to)
+            if not isinstance(to, (list, tuple)):
+                to = [to]
+
+        msg = self.get_message(level, alert, *args, **kwargs)
+        msg['Subject'] = self.get_short(level, alert, *args, **kwargs)
+        msg['From'] = sender
+        msg['To'] = ", ".join(to)
 
         smtp = SMTP()
         yield smtp_connect(smtp, self.options['host'], self.options['port'])  # pylint: disable=no-value-for-parameter
@@ -53,8 +62,8 @@ class SMTPHandler(AbstractHandler):
                              self.options['password'])
 
         try:
-            LOGGER.debug("Send message to: %s", ", ".join(self.options['to']))
-            smtp.sendmail(self.options['from'], self.options['to'], msg.as_string())
+            LOGGER.debug("Send message to: %s", ", ".join(to))
+            smtp.sendmail(sender, to, msg.as_string())
         finally:
             smtp.quit()
 

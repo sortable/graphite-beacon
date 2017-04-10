@@ -27,6 +27,15 @@ class HttpHandler(AbstractHandler):
     def notify(self, level, alert, value, target=None, ntype=None, rule=None):
         LOGGER.debug("Handler (%s) %s", self.name, level)
 
+        url = self.url
+        params = self.params
+        method = self.method
+        if alert.overrides and self.name in alert.overrides:
+            overrides = alert.overrides[self.name]
+            url = overrides.get('url', url)
+            params = overrides.get('params', params)
+            method = overrides.get('method', method)
+
         message = self.get_short(level, alert, value, target=target, ntype=ntype, rule=rule)
         data = {'alert': alert.name, 'desc': message, 'level': level}
         if target:
@@ -38,6 +47,7 @@ class HttpHandler(AbstractHandler):
             data['graph_url'] = alert.get_graph_url(target)
             data['value'] = value
 
-        data.update(self.params)
+        data.update(params)
         body = urllib.urlencode(data)
-        yield self.client.fetch(self.url, method=self.method, body=body)
+        yield self.client.fetch(url, method=method, body=body)
+
