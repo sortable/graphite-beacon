@@ -38,10 +38,10 @@ class SMTPHandler(AbstractHandler):
 
         sender = self.options['from']
         to = self.options['to']
-        if alert.overrides and self.name in alert.overrides:
-            overrides = alert.overrides[self.name]
-            sender = overrides.get('from', sender)
-            to = overrides.get('to', to)
+        if alert.override and self.name in alert.override:
+            override = alert.override[self.name]
+            sender = override.get('from', sender)
+            to = override.get('to', to)
             if not isinstance(to, (list, tuple)):
                 to = [to]
 

@@ -30,11 +30,11 @@ class HttpHandler(AbstractHandler):
         url = self.url
         params = self.params
         method = self.method
-        if alert.overrides and self.name in alert.overrides:
-            overrides = alert.overrides[self.name]
-            url = overrides.get('url', url)
-            params = overrides.get('params', params)
-            method = overrides.get('method', method)
+        if alert.override and self.name in alert.override:
+            override = alert.override[self.name]
+            url = override.get('url', url)
+            params = override.get('params', params)
+            method = override.get('method', method)
 
         message = self.get_short(level, alert, value, target=target, ntype=ntype, rule=rule)
         data = {'alert': alert.name, 'desc': message, 'level': level}

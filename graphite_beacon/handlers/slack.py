@@ -50,10 +50,10 @@ class SlackHandler(AbstractHandler):
 
         channel = self.channel
         username = self.username
-        if alert.overrides and self.name in alert.overrides:
-            overrides = alert.overrides[self.name]
-            channel = self._make_channel_name(overrides.get('channel', channel))
-            username = overrides.get('username', username)
+        if alert.override and self.name in alert.override:
+            override = alert.override[self.name]
+            channel = self._make_channel_name(override.get('channel', channel))
+            username = override.get('username', username)
 
         message = self.get_message(level, alert, *args, **kwargs)
         data = dict()

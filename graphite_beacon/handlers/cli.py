@@ -27,9 +27,9 @@ class CliHandler(AbstractHandler):
             return name.rsplit(' ', 1)[0].strip()
 
         command_template = self.command_template
-        if alert.overrides and self.name in alert.overrides:
-            overrides = alert.overrides[self.name]
-            command_template = overrides.get('command', command_template)
+        if alert.override and self.name in alert.override:
+            override = alert.override[self.name]
+            command_template = override.get('command', command_template)
 
         # Run only for whitelisted names if specified
         if not self.whitelist or get_alert_name(*args) in self.whitelist:

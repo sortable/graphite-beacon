@@ -28,10 +28,10 @@ class VictorOpsHandler(AbstractHandler):
         LOGGER.debug("Handler (%s) %s", self.name, level)
         url = self.url
         routing_key = self.routing_key
-        if alert.overrides and self.name in alert.overrides:
-            overrides = alert.overrides[self.name]
-            url = overrides.get('url', url)
-            routing_key = overrides.get('routing_key', routing_key)
+        if alert.override and self.name in alert.override:
+            override = alert.override[self.name]
+            url = override.get('url', url)
+            routing_key = override.get('routing_key', routing_key)
             url = urljoin(url, routing_key)
 
         message = self.get_short(level, alert, value, target=target, ntype=ntype, rule=rule)

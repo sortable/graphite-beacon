@@ -35,9 +35,9 @@ class HipChatHandler(AbstractHandler):
         LOGGER.debug("Handler (%s) %s", self.name, level)
 
         room = self.room
-        if alert.overrides and self.name in alert.overrides:
-            overrides = alert.overrides[self.name]
-            room = overrides.get('room', room)
+        if alert.override and self.name in alert.override:
+            override = alert.override[self.name]
+            room = override.get('room', room)
 
         data = {
             'message': self.get_short(level, alert, *args, **kwargs).decode('UTF-8'),
