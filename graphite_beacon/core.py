@@ -13,7 +13,7 @@ from .units import MILLISECOND, TimeUnit
 
 LOGGER = log.gen_log
 
-COMMENT_RE = re(r'//\s+.*$', M)
+COMMENT_RE = re(r'//.*$', M)
 
 
 class Reactor(object):
