@@ -244,7 +244,10 @@ Currently two types of alerts are supported:
       // Operator one of [>, <, >=, <=, ==, !=]
       // Value (absolute value: 3000000 or short form like 3MB/12minute)
       // Multiple conditions can be separated by AND or OR conditions
-      "rules": [ "critical: < 200MB", "warning: < 300MB" ]
+      "rules": [ "critical: < 200MB", "warning: < 300MB" ],
+
+      // (optional) A link to more information about how to debug this alert.
+      "help_url": "https://example.org/useful-information"
     }
   ]
 ```

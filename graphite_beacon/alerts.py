@@ -138,6 +138,8 @@ class BaseAlert(_.with_metaclass(AlertFabric)):
         self.no_data = options.get('no_data', self.reactor.options['no_data'])
         self.loading_error = options.get('loading_error', self.reactor.options['loading_error'])
 
+        self.help_url = options.get('help_url')
+
         if self.reactor.options.get('debug'):
             self.callback = ioloop.PeriodicCallback(self.load, 5000)
         else:

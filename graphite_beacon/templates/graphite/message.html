@@ -34,6 +34,10 @@
 
             <b>Query:</b> {{ alert.query }}</b> <br/>
 
+            {% if alert.help_url %}
+            <b>Learn more:</b> <a href="{{ alert.help_url }}">{{alert.help_url}}</a> <br/>
+            {% end %}
+
             {% if rule %}
                 <b>Rule:</b> {{ rule['raw'] }}</b> <br/>
             {% end %}
