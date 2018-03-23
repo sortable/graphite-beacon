@@ -20,7 +20,7 @@ class VictorOpsHandler(AbstractHandler):
         assert self.url, 'REST Endpoint is not defined'
 
         self.routing_key = self.options.get('routing_key', 'everyone')
-        
+
         self.client = hc.AsyncHTTPClient()
 
     @gen.coroutine

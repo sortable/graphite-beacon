@@ -50,4 +50,3 @@ class HttpHandler(AbstractHandler):
         data.update(params)
         body = urllib.urlencode(data)
         yield self.client.fetch(url, method=method, body=body)
-
