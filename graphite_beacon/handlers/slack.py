@@ -7,6 +7,25 @@ from graphite_beacon.handlers import LOGGER, AbstractHandler
 from graphite_beacon.template import TEMPLATES
 
 
+def _nub(xs):
+    """Return new list containing unique elements of xs, retaining
+    order."""
+    seen = set()
+    result = []
+    for x in xs:
+        if x not in seen:
+            result.append(x)
+            seen.add(x)
+    return result
+
+
+def _ensure_prefix(s):
+    """Ensure s starts with '@'."""
+    if not s.startswith('@'):
+        s = '@' + s
+    return s
+
+
 class SlackHandler(AbstractHandler):
 
     name = 'slack'
@@ -16,6 +35,9 @@ class SlackHandler(AbstractHandler):
         'webhook': None,
         'channel': None,
         'username': 'graphite-beacon',
+        'mentions_critical': [],
+        'mentions_warning': [],
+        'additional_mentions': []
     }
 
     emoji = {
@@ -38,11 +60,30 @@ class SlackHandler(AbstractHandler):
         self.username = self.options.get('username')
         self.client = hc.AsyncHTTPClient()
 
-    def get_message(self, level, alert, value, target=None, ntype=None, rule=None):  # pylint: disable=unused-argument
+    def get_message(
+            self, level, alert, value,
+            target=None,
+            ntype=None,
+            rule=None,
+            mentions=None):
         msg_type = 'slack' if ntype == 'graphite' else 'short'
+        mentions = ', '.join(self.get_mentions(level, alert))
         tmpl = TEMPLATES[ntype][msg_type]
         return tmpl.generate(
-            level=level, reactor=self.reactor, alert=alert, value=value, target=target).strip()
+            level=level, reactor=self.reactor, alert=alert, mentions=mentions, value=value, target=target).strip()
+
+    def get_mentions(self, level, alert):
+        """Return a list of @-mentions to use in the slack message."""
+        level_mentions = level + '_mentions'
+        mentions = self.options.get(level_mentions, [])
+        if alert.override and self.name in alert.override:
+            overrides = alert.override[self.name]
+            mentions = overrides.get(level_mentions, mentions)
+            mentions += overrides.get('additional_mentions', [])
+        mentions = [username.strip() for username in mentions]
+        mentions = [_ensure_prefix(username) for username in mentions if username]
+        mentions = _nub(mentions)
+        return mentions
 
     @gen.coroutine
     def notify(self, level, alert, *args, **kwargs):

@@ -1,6 +1,6 @@
 {% if level == 'normal' %}
 {{ reactor.options.get('prefix') }} {{level.upper() }} <{{ alert.name }}>{% if target %} `{{target}}`{% end %} is back to normal.
 {% else %}
-{{ reactor.options.get('prefix') }} {{ level.upper() }} <{{ alert.name }}>{% if target %} `{{target}}`{% end %} failed. Current value: {{ alert.convert(value) }}
+{{ reactor.options.get('prefix') }} {{ level.upper() }} <{{ alert.name }}>{% if target %} `{{target}}`{% end %} failed. Current value: {{ alert.convert(value) }}{% if mentions %} /cc {{ mentions }}{% end %}
 {% if target %}⇨ <{{ alert.get_graph_url(alert.query) }}|View Graph>{% end %} {% if alert.help_url %}⇨ <{{ alert.help_url}}|Learn More>{% end %}
 {% end %}
