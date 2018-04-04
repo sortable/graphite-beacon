@@ -57,6 +57,7 @@ class SlackHandler(AbstractHandler):
             self, level, alert, value,
             target=None,
             ntype=None,
+            rule=None,
             mentions=None):
         msg_type = 'slack' if ntype == 'graphite' else 'short'
         mentions = ', '.join(['<{}>'.format(m) for m in self.get_mentions(level, alert)])
