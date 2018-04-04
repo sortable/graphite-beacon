@@ -7,23 +7,16 @@ from graphite_beacon.handlers import LOGGER, AbstractHandler
 from graphite_beacon.template import TEMPLATES
 
 
-def _nub(xs):
-    """Return new list containing unique elements of xs, retaining
+def _nub(items):
+    """Return new list containing unique elements of items, retaining
     order."""
     seen = set()
     result = []
-    for x in xs:
-        if x not in seen:
-            result.append(x)
-            seen.add(x)
+    for item in items:
+        if item not in seen:
+            result.append(item)
+            seen.add(item)
     return result
-
-
-def _ensure_prefix(s):
-    """Ensure s starts with '@'."""
-    if not s.startswith('@'):
-        s = '@' + s
-    return s
 
 
 class SlackHandler(AbstractHandler):
@@ -64,13 +57,17 @@ class SlackHandler(AbstractHandler):
             self, level, alert, value,
             target=None,
             ntype=None,
-            rule=None,
             mentions=None):
         msg_type = 'slack' if ntype == 'graphite' else 'short'
-        mentions = ', '.join(self.get_mentions(level, alert))
+        mentions = ', '.join(['<{}>'.format(m) for m in self.get_mentions(level, alert)])
         tmpl = TEMPLATES[ntype][msg_type]
         return tmpl.generate(
-            level=level, reactor=self.reactor, alert=alert, mentions=mentions, value=value, target=target).strip()
+            level=level,
+            reactor=self.reactor,
+            alert=alert,
+            mentions=mentions,
+            value=value,
+            target=target).strip()
 
     def get_mentions(self, level, alert):
         """Return a list of @-mentions to use in the slack message."""
@@ -81,7 +78,7 @@ class SlackHandler(AbstractHandler):
             mentions = overrides.get(level_mentions, mentions)
             mentions += overrides.get('additional_mentions', [])
         mentions = [username.strip() for username in mentions]
-        mentions = [_ensure_prefix(username) for username in mentions if username]
+        mentions = [username for username in mentions if username]
         mentions = _nub(mentions)
         return mentions
 
